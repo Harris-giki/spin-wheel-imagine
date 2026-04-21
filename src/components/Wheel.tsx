@@ -118,7 +118,7 @@ export const Wheel = forwardRef<WheelHandle, Props>(function Wheel(
         <svg width="44" height="52" viewBox="0 0 44 52" fill="none" style={{ filter: "drop-shadow(0 6px 12px rgba(31,14,71,0.45))" }}>
           <defs>
             <linearGradient id="pinGrad" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="#7c3aed" />
+              <stop offset="0%" stopColor="#a78bfa" />
               <stop offset="100%" stopColor="#1f0e47" />
             </linearGradient>
           </defs>

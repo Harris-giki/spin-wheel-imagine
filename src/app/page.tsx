@@ -41,6 +41,9 @@ export default function HomePage() {
   const [errorModal, setErrorModal] = useState<null | "INVALID_EMAIL" | "NETWORK">(null);
   const [alreadySpun, setAlreadySpun] = useState(false);
   const [result, setResult] = useState<SpinResult | null>(null);
+  // Modal auto-opens when a spin resolves; closing it keeps the user on the
+  // main (wheel) screen with a persistent win banner rather than signing out.
+  const [resultModalOpen, setResultModalOpen] = useState(false);
   const wheelRef = useRef<WheelHandle>(null);
 
   async function handleVerify(e: React.FormEvent) {
@@ -89,6 +92,8 @@ export default function HomePage() {
       const landOn = data.result.kind === "prize" ? data.result.prizeKey : null;
       await wheelRef.current?.spinTo(landOn);
       setResult(data.result);
+      setAlreadySpun(true);
+      setResultModalOpen(true);
       setStage("result");
     } catch {
       setErrorModal("NETWORK");
@@ -96,16 +101,12 @@ export default function HomePage() {
     }
   }
 
-  function reset() {
-    setStage("email");
-    setEmail("");
-    setAlreadySpun(false);
-    setResult(null);
+  function closeResultModal() {
+    setResultModalOpen(false);
   }
 
   return (
     <main className="min-h-screen flex flex-col relative overflow-x-hidden">
-      <BackgroundSparkles />
       <TopBar />
 
       <div className="flex-1 flex items-start md:items-center justify-center px-4 py-6 sm:py-10 relative z-10">
@@ -113,7 +114,7 @@ export default function HomePage() {
           {stage === "email" && (
             <motion.div
               key="email"
-              className="w-full max-w-[460px]"
+              className="w-full max-w-[520px]"
               initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -16 }}
@@ -131,12 +132,19 @@ export default function HomePage() {
           {(stage === "ready" || stage === "spinning" || stage === "result") && (
             <motion.div
               key="wheel"
-              className="w-full max-w-[980px]"
+              className="w-full max-w-[980px] flex flex-col gap-5"
               initial={{ opacity: 0, scale: 0.96 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.96 }}
               transition={{ duration: 0.35 }}
             >
+              {stage === "result" && result && !resultModalOpen && (
+                <WinBanner
+                  result={result}
+                  email={email}
+                  onReopen={() => setResultModalOpen(true)}
+                />
+              )}
               <WheelCard
                 wheelRef={wheelRef}
                 email={email}
@@ -169,8 +177,8 @@ export default function HomePage() {
             onPrimary={() => setErrorModal(null)}
           />
         )}
-        {stage === "result" && result && (
-          <ResultModal result={result} email={email} onClose={reset} />
+        {stage === "result" && result && resultModalOpen && (
+          <ResultModal result={result} email={email} onClose={closeResultModal} />
         )}
       </AnimatePresence>
     </main>
@@ -191,7 +199,7 @@ function TopBar() {
           width={180}
           height={36}
           priority
-          className="block dark:hidden h-8 sm:h-9 w-auto"
+          className="block dark:hidden h-7 sm:h-8 w-auto"
         />
         <Image
           src="/Layer_1.png"
@@ -199,12 +207,12 @@ function TopBar() {
           width={180}
           height={36}
           priority
-          className="hidden dark:block h-8 sm:h-9 w-auto"
+          className="hidden dark:block h-7 sm:h-8 w-auto"
         />
       </a>
       <div className="flex items-center gap-3">
-        <div className="hidden sm:flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.2em] text-ink-700/80 dark:text-white/70">
-          <Sparkle className="h-3.5 w-3.5 text-lilac-500 dark:text-lilac-300" />
+        <div className="hidden sm:inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-ink-900/5 dark:bg-white/[0.06] border border-ink-100 dark:border-white/10 text-[10.5px] font-semibold uppercase tracking-[0.22em] text-ink-700/80 dark:text-white/80">
+          <Sparkle className="h-3 w-3 text-lilac-500 dark:text-lilac-300" />
           Spin &amp; Win
         </div>
         <ThemeToggle />
@@ -215,8 +223,8 @@ function TopBar() {
 
 function Footer() {
   return (
-    <footer className="relative z-10 px-5 py-6 text-center text-[11px] text-ink-700/55 dark:text-white/40 tracking-wide">
-      1 spin per account · Codes valid 48h · DM @ImagineArt to redeem
+    <footer className="relative z-10 px-5 py-6 text-center text-[11px] text-ink-700/55 dark:text-white/45 tracking-wide">
+      1 spin per account · Codes valid 48h · Questions? @ImagineArt
     </footer>
   );
 }
@@ -235,38 +243,125 @@ function Sparkle({
   );
 }
 
-function BackgroundSparkles() {
-  const positions = [
-    { top: "12%", left: "8%", size: 18, delay: "0s" },
-    { top: "22%", right: "10%", size: 14, delay: "1.1s" },
-    { top: "68%", left: "6%", size: 22, delay: "0.6s" },
-    { top: "78%", right: "12%", size: 16, delay: "1.8s" },
-    { top: "40%", right: "4%", size: 10, delay: "2.4s" },
-    { top: "55%", left: "3%", size: 10, delay: "0.9s" },
-  ];
-  return (
-    <div aria-hidden className="absolute inset-0 pointer-events-none overflow-hidden">
-      {positions.map((p, i) => (
-        <Sparkle
-          key={i}
-          className="spark text-lilac-400 animate-sparkle"
-          style={{
-            width: p.size,
-            height: p.size,
-            top: p.top,
-            left: p.left,
-            right: p.right,
-            animationDelay: p.delay,
-          } as React.CSSProperties}
-        />
-      ))}
-    </div>
-  );
-}
-
 /* -------------------------------------------------------------------------- */
 /* Cards                                                                      */
 /* -------------------------------------------------------------------------- */
+
+function WinBanner({
+  result,
+  email,
+  onReopen,
+}: {
+  result: SpinResult;
+  email: string;
+  onReopen: () => void;
+}) {
+  if (result.kind === "consolation_luck") {
+    return (
+      <motion.div
+        initial={{ opacity: 0, y: -10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.3 }}
+        className="glass-card p-5 sm:p-6"
+      >
+        <div className="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-5">
+          <div className="flex-1 min-w-0">
+            <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-ink-900/5 dark:bg-white/[0.06] border border-ink-100 dark:border-white/10 text-[9.5px] font-bold tracking-[0.24em] uppercase text-ink-700/75 dark:text-white/75 mb-2">
+              Better luck next time
+            </div>
+            <h3 className="font-display text-[22px] sm:text-[26px] font-bold text-ink-900 dark:text-white tracking-[-0.02em] leading-tight">
+              {result.title}
+            </h3>
+            <p className="text-ink-700/70 dark:text-white/65 text-[12.5px] mt-1 truncate">
+              {result.subtitle} · <span className="font-medium text-ink-900/85 dark:text-white/85">{email}</span>
+            </p>
+          </div>
+          <div className="flex gap-2 shrink-0">
+            <a
+              href="https://instagram.com/imagineart"
+              target="_blank"
+              rel="noreferrer"
+              className="btn-gradient rounded-[12px] text-white font-bold tracking-wide px-4 py-2.5 text-[12.5px] text-center whitespace-nowrap"
+            >
+              Follow on Instagram
+            </a>
+            <button
+              onClick={onReopen}
+              className="rounded-[12px] border border-ink-200 dark:border-white/15 text-ink-900 dark:text-white font-semibold tracking-wide px-4 py-2.5 text-[12.5px] hover:bg-ink-50 dark:hover:bg-white/[0.06] transition"
+            >
+              Details
+            </button>
+          </div>
+        </div>
+      </motion.div>
+    );
+  }
+
+  const isCredits =
+    result.kind === "consolation_credits" ||
+    (result.kind === "prize" && result.category === "credits");
+  const tag =
+    result.kind === "consolation_credits" ? "Consolation win" : "You won";
+  const code = result.code;
+  const link = result.redemptionLink;
+  const ctaLabel = isCredits ? "Access credits form →" : "Redeem discount →";
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: -10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.3 }}
+      className="glass-card p-5 sm:p-6 overflow-hidden"
+    >
+      <div className="glow-behind" />
+      <div className="relative flex flex-col lg:flex-row lg:items-center gap-4 lg:gap-6">
+        {/* Prize + email */}
+        <div className="flex-1 min-w-0">
+          <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-lilac-gradient text-white text-[9.5px] font-bold tracking-[0.26em] uppercase mb-2 shadow-glow">
+            <Sparkle className="h-2.5 w-2.5" />
+            {tag}
+          </div>
+          <h3 className="font-display text-[24px] sm:text-[28px] font-bold leading-[1] tracking-[-0.02em]">
+            <span className="bg-lilac-gradient bg-clip-text text-transparent">{result.title}</span>
+          </h3>
+          <p className="text-ink-700/70 dark:text-white/65 text-[12.5px] mt-1.5 truncate">
+            {result.subtitle} · <span className="font-semibold text-ink-900 dark:text-white">{email}</span>
+          </p>
+        </div>
+
+        {/* Code box */}
+        <div className="shrink-0 rounded-[14px] border border-dashed border-lilac-300/70 dark:border-lilac-400/50 bg-lilac-50/60 dark:bg-lilac-400/[0.06] px-4 py-2.5 min-w-[160px] text-center">
+          <div className="text-[9px] uppercase tracking-[0.24em] text-ink-700/60 dark:text-white/55 mb-0.5 font-bold">
+            {isCredits ? "Reference" : "Promo code"}
+          </div>
+          <div className="font-display font-bold text-[15px] tracking-[0.06em] select-all text-ink-900 dark:text-white break-all">
+            {code}
+          </div>
+        </div>
+
+        {/* Actions */}
+        <div className="flex gap-2 shrink-0">
+          {link && (
+            <a
+              href={link}
+              target="_blank"
+              rel="noreferrer"
+              className="btn-gradient rounded-[12px] text-white font-bold tracking-wide px-4 py-2.5 text-[12.5px] text-center whitespace-nowrap"
+            >
+              {ctaLabel}
+            </a>
+          )}
+          <button
+            onClick={onReopen}
+            className="rounded-[12px] border border-ink-200 dark:border-white/15 text-ink-900 dark:text-white font-semibold tracking-wide px-4 py-2.5 text-[12.5px] hover:bg-ink-50 dark:hover:bg-white/[0.06] transition whitespace-nowrap"
+          >
+            Details
+          </button>
+        </div>
+      </div>
+    </motion.div>
+  );
+}
 
 function EmailCard({
   email,
@@ -280,52 +375,49 @@ function EmailCard({
   loading: boolean;
 }) {
   return (
-    <div className="relative">
-      <div className="aurora rounded-[36px]" />
-      <div className="relative rounded-[32px] bg-white dark:bg-[#140a35]/80 dark:backdrop-blur-xl border border-ink-100 dark:border-white/10 shadow-card-lg p-7 sm:p-8 grain">
-        <div className="inline-flex items-center gap-2 text-[10px] font-bold tracking-[0.22em] px-3 py-1.5 rounded-full bg-ink-900 dark:bg-white/10 text-white mb-5">
-          <Sparkle className="h-3 w-3 text-lilac-300" />
-          WORLD CREATIVITY &amp; INNOVATION DAY
-        </div>
-        <h1 className="font-display text-[36px] sm:text-[42px] leading-[1.02] font-bold text-ink-900 dark:text-white mb-3 tracking-tight">
-          Spin &amp; Win
-          <br />
-          <span className="bg-lilac-gradient bg-clip-text text-transparent">
-            Exclusive Rewards.
-          </span>
-        </h1>
-        <p className="text-ink-700/75 dark:text-white/70 text-[14.5px] leading-relaxed mb-6">
-          Enter your registered email to unlock your one-time spin.
-        </p>
-
-        <form onSubmit={onSubmit} className="flex flex-col gap-3">
-          <label className="relative block">
-            <span className="sr-only">Email address</span>
-            <input
-              type="email"
-              required
-              autoComplete="email"
-              placeholder="your@email.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-full rounded-2xl bg-ink-50 dark:bg-white/5 border border-ink-100 dark:border-white/10 focus:border-lilac-500 dark:focus:border-lilac-400 focus:bg-white dark:focus:bg-white/10 text-ink-900 dark:text-white placeholder:text-ink-700/35 dark:placeholder:text-white/30 px-4 py-3.5 text-[15px] transition"
-            />
-          </label>
-          <button
-            type="submit"
-            disabled={loading || !email.trim()}
-            className="group relative rounded-2xl bg-brand-gradient text-white font-semibold tracking-wide px-4 py-3.5 text-[15px] transition hover:brightness-110 disabled:opacity-50 disabled:cursor-not-allowed shadow-glow"
-          >
-            {loading ? "Checking…" : "Continue →"}
-          </button>
-        </form>
-
-        <p className="text-[11px] text-ink-700/50 dark:text-white/45 text-center mt-5 leading-relaxed">
-          By continuing you agree to the campaign T&amp;Cs.
-          <br />
-          Limit: <span className="font-semibold text-ink-900 dark:text-white">1 spin per account</span>.
-        </p>
+    <div className="glass-card p-7 sm:p-9">
+      <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-lilac-gradient text-white text-[9.5px] font-bold tracking-[0.26em] uppercase mb-6 shadow-glow">
+        <Sparkle className="h-2.5 w-2.5" />
+        World Creativity &amp; Innovation Day
       </div>
+
+      <h1 className="font-display text-[44px] sm:text-[52px] leading-[0.95] font-bold text-ink-900 dark:text-white tracking-[-0.035em]">
+        Spin once.
+        <br />
+        <span className="bg-lilac-gradient bg-clip-text text-transparent">
+          Win something rare.
+        </span>
+      </h1>
+      <p className="text-ink-700/75 dark:text-white/70 text-[14.5px] leading-relaxed mt-4 mb-7 max-w-[380px]">
+        Enter the email tied to your ImagineArt account to claim your one-time spin.
+      </p>
+
+      <form onSubmit={onSubmit} className="flex flex-col">
+        <label className="block text-[9.5px] uppercase tracking-[0.24em] font-semibold text-ink-700/55 dark:text-white/55 mb-2">
+          Account email
+        </label>
+        <input
+          type="email"
+          required
+          autoComplete="email"
+          placeholder="you@studio.com"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          className="w-full rounded-[14px] bg-ink-50 dark:bg-white/[0.04] border border-ink-100 dark:border-white/10 focus:border-lilac-500 dark:focus:border-lilac-400 focus:bg-white dark:focus:bg-white/[0.07] text-ink-900 dark:text-white placeholder:text-ink-700/35 dark:placeholder:text-white/30 px-[18px] py-4 text-[15px] transition"
+        />
+
+        <button
+          type="submit"
+          disabled={loading || !email.trim()}
+          className="btn-gradient rounded-[14px] text-white font-bold tracking-wide px-4 py-4 text-[13.5px] transition disabled:opacity-50 disabled:cursor-not-allowed mt-4"
+        >
+          {loading ? "Checking…" : "Continue →"}
+        </button>
+      </form>
+
+      <p className="text-[11px] text-ink-700/50 dark:text-white/45 text-center mt-5 leading-relaxed">
+        1 spin per account · Codes valid 48h
+      </p>
     </div>
   );
 }
@@ -349,142 +441,111 @@ function WheelCard({
   const done = stage === "result" || alreadySpun;
 
   return (
-    <div className="relative">
-      <div className="aurora rounded-[36px]" />
-      <div className="relative rounded-[32px] bg-white dark:bg-[#140a35]/80 dark:backdrop-blur-xl border border-ink-100 dark:border-white/10 shadow-card-lg p-6 sm:p-8 grain">
-        <div className="text-center mb-5">
-          <div className="inline-flex items-center gap-2 text-[10px] font-bold tracking-[0.22em] px-3 py-1.5 rounded-full bg-lilac-gradient text-white mb-3 shadow-glow">
-            <Sparkle className="h-3 w-3" />
-            {alreadySpun ? "ALREADY SPUN" : "WORLD CREATIVITY & INNOVATION DAY"}
+    <div className="glass-card p-6 sm:p-8">
+      <div className="text-center mb-6">
+        <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-lilac-gradient text-white text-[9.5px] font-bold tracking-[0.26em] uppercase mb-3 shadow-glow">
+          <Sparkle className="h-2.5 w-2.5" />
+          {alreadySpun ? "Already spun" : "World Creativity & Innovation Day"}
+        </div>
+        <h2 className="font-display text-[30px] sm:text-[36px] leading-[1] font-bold text-ink-900 dark:text-white tracking-[-0.03em]">
+          {alreadySpun
+            ? "You've already spun."
+            : spinning
+            ? "Good luck…"
+            : "Tap to spin"}
+        </h2>
+        <p className="text-ink-700/70 dark:text-white/65 text-[13.5px] mt-2">
+          {alreadySpun
+            ? "Here's the prize we saved for you."
+            : spinning
+            ? "Picking your prize from 500 slots."
+            : "One spin only. Make it count."}
+        </p>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 items-start">
+        {/* Left: wheel + CTA */}
+        <div className="flex flex-col items-center">
+          <Wheel ref={wheelRef} size={320} disabled={done || spinning} />
+
+          <div className="mt-7 flex flex-col items-center gap-2.5 w-full max-w-[320px]">
+            <button
+              onClick={onSpin}
+              disabled={spinning || done}
+              className="btn-gradient w-full rounded-[14px] text-white font-bold tracking-[0.18em] uppercase py-3.5 text-[12px] transition disabled:opacity-40 disabled:cursor-not-allowed"
+            >
+              {spinning ? "Spinning…" : done ? "Spin used" : "Spin now"}
+            </button>
+            <p className="text-[11px] text-ink-700/55 dark:text-white/55 tracking-wide">
+              <span className="font-medium text-ink-900/80 dark:text-white/85">{email}</span> ·{" "}
+              {done ? "0 spins left" : "1 spin remaining"}
+            </p>
           </div>
-          <h2 className="font-display text-[28px] sm:text-[32px] leading-tight font-bold text-ink-900 dark:text-white tracking-tight">
-            {alreadySpun
-              ? "You've already spun."
-              : spinning
-              ? "Good luck…"
-              : "Tap to spin"}
-          </h2>
-          <p className="text-ink-700/70 dark:text-white/65 text-[13.5px] mt-1">
-            {alreadySpun
-              ? "Here's the prize we saved for you."
-              : spinning
-              ? "Hold tight while we pick your prize."
-              : "One spin only. Make it count."}
-          </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-[1fr,1fr] gap-6 md:gap-8 items-start">
-          {/* Left: wheel + CTA */}
-          <div className="flex flex-col items-center">
-            <div className="py-2">
-              <Wheel ref={wheelRef} size={340} disabled={done || spinning} />
-            </div>
-
-            <div className="mt-7 flex flex-col items-center gap-2 w-full max-w-[360px]">
-              <button
-                onClick={onSpin}
-                disabled={spinning || done}
-                className="w-full rounded-2xl bg-brand-gradient text-white font-bold tracking-wider uppercase py-4 text-[14px] transition hover:brightness-110 disabled:opacity-40 disabled:cursor-not-allowed shadow-glow"
-              >
-                {spinning ? "Spinning…" : done ? "Spin used" : "Spin Now"}
-              </button>
-              <p className="text-[11.5px] text-ink-700/55 dark:text-white/55 mt-1">
-                <span className="font-medium text-ink-900/80 dark:text-white/85">{email}</span> ·{" "}
-                {done ? "0 spins left" : "1 spin remaining"}
-              </p>
-            </div>
-          </div>
-
-          {/* Right: prize legend */}
-          <PrizeLegend wonPrizeKey={wonPrizeKey} />
-        </div>
+        {/* Right: prize pool */}
+        <PrizeLegend wonPrizeKey={wonPrizeKey} />
       </div>
     </div>
   );
 }
 
 function PrizeLegend({ wonPrizeKey }: { wonPrizeKey: string | null }) {
-  const groups: { title: string; prizes: typeof PRIZES }[] = [
-    { title: "Grand Prizes", prizes: PRIZES.filter((p) => p.category === "creator") },
-    { title: "Ultimate Rewards", prizes: PRIZES.filter((p) => p.category === "ultimate") },
-    { title: "Standard Deals", prizes: PRIZES.filter((p) => p.category === "standard") },
-    { title: "Credit Packs", prizes: PRIZES.filter((p) => p.category === "credits") },
-  ];
-
   return (
-    <div className="rounded-2xl bg-ink-50/60 dark:bg-white/5 border border-ink-100 dark:border-white/10 p-4 sm:p-5 max-h-[520px] md:max-h-[560px] overflow-y-auto">
+    <div className="rounded-[18px] bg-ink-50/60 dark:bg-white/[0.03] border border-ink-100 dark:border-white/[0.07] p-4 sm:p-5 max-h-[520px] md:max-h-[560px] overflow-y-auto">
       <div className="flex items-center justify-between mb-3">
-        <h3 className="font-display text-[15px] font-bold text-ink-900 dark:text-white tracking-tight">
-          Prize Pool
+        <h3 className="font-display text-[14px] font-bold text-ink-900 dark:text-white tracking-tight">
+          Prize pool
         </h3>
-        <span className="text-[10px] uppercase tracking-[0.18em] text-ink-700/55 dark:text-white/55 font-semibold">
-          15 Rewards
+        <span className="text-[9px] uppercase tracking-[0.22em] text-ink-700/55 dark:text-white/55 font-semibold">
+          15 rewards
         </span>
       </div>
 
-      <div className="space-y-4">
-        {groups.map((g) => (
-          <div key={g.title}>
-            <div className="text-[10px] uppercase tracking-[0.18em] text-ink-700/60 dark:text-white/55 font-bold mb-1.5 px-1">
-              {g.title}
+      <div className="grid grid-cols-2 gap-1.5">
+        {PRIZES.map((p, i) => {
+          const highlight = wonPrizeKey === p.key;
+          const number = i + 1;
+          return (
+            <div
+              key={p.key}
+              className={
+                "flex items-center gap-2 rounded-[10px] px-2.5 py-2 border transition " +
+                (highlight
+                  ? "bg-lilac-gradient border-transparent shadow-glow animate-pop-in"
+                  : "bg-white/60 dark:bg-white/[0.02] border-ink-100 dark:border-white/[0.04] hover:bg-white dark:hover:bg-white/[0.05]")
+              }
+            >
+              <span
+                className="w-[22px] h-[22px] rounded-md shrink-0 grid place-items-center text-[10px] font-bold font-display"
+                style={{
+                  background: p.color,
+                  color: p.textColor,
+                }}
+              >
+                {number}
+              </span>
+              <div className="min-w-0 flex-1">
+                <div
+                  className={
+                    "text-[11.5px] font-bold leading-tight truncate " +
+                    (highlight ? "text-white" : "text-ink-900 dark:text-white")
+                  }
+                >
+                  {p.title}
+                </div>
+                <div
+                  className={
+                    "text-[10px] leading-tight truncate " +
+                    (highlight ? "text-white/85" : "text-ink-700/60 dark:text-white/55")
+                  }
+                >
+                  {p.subtitle}
+                </div>
+              </div>
             </div>
-            <ul className="space-y-1">
-              {g.prizes.map((p) => {
-                const highlight = wonPrizeKey === p.key;
-                const number = PRIZES.findIndex((x) => x.key === p.key) + 1;
-                return (
-                  <li
-                    key={p.key}
-                    className={
-                      "flex items-center gap-2.5 rounded-xl px-2.5 py-2 transition " +
-                      (highlight
-                        ? "bg-lilac-gradient shadow-glow animate-pop-in"
-                        : "hover:bg-white dark:hover:bg-white/10")
-                    }
-                  >
-                    <span
-                      className={
-                        "w-6 h-6 rounded-md shrink-0 grid place-items-center text-[10px] font-bold " +
-                        (highlight
-                          ? "ring-2 ring-white/70"
-                          : "ring-1 ring-ink-100 dark:ring-white/15")
-                      }
-                      style={{
-                        background: p.color,
-                        color: p.textColor,
-                      }}
-                    >
-                      {number}
-                    </span>
-                    <div className="min-w-0 flex-1">
-                      <div
-                        className={
-                          "text-[13px] font-bold leading-tight truncate " +
-                          (highlight ? "text-white" : "text-ink-900 dark:text-white")
-                        }
-                      >
-                        {p.title}
-                      </div>
-                      <div
-                        className={
-                          "text-[11px] leading-tight truncate " +
-                          (highlight ? "text-white/85" : "text-ink-700/65 dark:text-white/60")
-                        }
-                      >
-                        {p.subtitle}
-                      </div>
-                    </div>
-                    {highlight && (
-                      <span className="text-[10px] font-bold uppercase tracking-[0.12em] text-white shrink-0 pr-1">
-                        Won
-                      </span>
-                    )}
-                  </li>
-                );
-              })}
-            </ul>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );
@@ -494,7 +555,7 @@ function PrizeLegend({ wonPrizeKey }: { wonPrizeKey: string | null }) {
 /* Modals                                                                     */
 /* -------------------------------------------------------------------------- */
 
-function ModalShell({ children }: { children: React.ReactNode }) {
+function ModalShell({ children, wide = false }: { children: React.ReactNode; wide?: boolean }) {
   return (
     <motion.div
       className="fixed inset-0 z-50 flex items-center justify-center px-4"
@@ -504,13 +565,16 @@ function ModalShell({ children }: { children: React.ReactNode }) {
     >
       <div className="absolute inset-0 bg-ink-900/60 dark:bg-black/70 backdrop-blur-md" />
       <motion.div
-        className="relative w-full max-w-[440px] rounded-[28px] bg-white dark:bg-[#140a35]/95 dark:backdrop-blur-xl border border-ink-100 dark:border-white/10 shadow-card-lg p-6 sm:p-7 overflow-hidden"
-        initial={{ scale: 0.9, y: 20 }}
+        className={
+          "glass-card relative w-full p-6 sm:p-8 overflow-hidden " +
+          (wide ? "max-w-[480px]" : "max-w-[440px]")
+        }
+        initial={{ scale: 0.92, y: 20 }}
         animate={{ scale: 1, y: 0 }}
-        exit={{ scale: 0.9, y: 20 }}
+        exit={{ scale: 0.92, y: 20 }}
         transition={{ type: "spring", stiffness: 350, damping: 26 }}
       >
-        <div className="aurora rounded-[28px]" />
+        <div className="glow-behind" />
         <div className="relative">{children}</div>
       </motion.div>
     </motion.div>
@@ -531,13 +595,16 @@ function GenericModal({
   return (
     <ModalShell>
       <div className="text-center">
-        <h3 className="font-display text-[26px] font-bold mb-2 text-ink-900 dark:text-white tracking-tight">
+        <div className="w-[54px] h-[54px] mx-auto mb-4 rounded-full grid place-items-center text-[26px] font-bold text-[#4a0f06]" style={{ background: "linear-gradient(135deg, #ffb4a3, #ff8066)" }}>
+          !
+        </div>
+        <h3 className="font-display text-[24px] font-bold mb-2 text-ink-900 dark:text-white tracking-[-0.02em]">
           {title}
         </h3>
-        <p className="text-ink-700/75 dark:text-white/70 text-[14px] leading-relaxed mb-5">{body}</p>
+        <p className="text-ink-700/75 dark:text-white/65 text-[13.5px] leading-relaxed mb-5">{body}</p>
         <button
           onClick={onPrimary}
-          className="w-full rounded-2xl bg-brand-gradient text-white font-semibold tracking-wide py-3 text-[14px] shadow-glow"
+          className="btn-gradient w-full rounded-[14px] text-white font-bold tracking-wide py-3.5 text-[13px]"
         >
           {primaryLabel}
         </button>
@@ -555,20 +622,24 @@ function ResultModal({
   email: string;
   onClose: () => void;
 }) {
+  // Credits winners go through a 2-step flow: first they screenshot, then
+  // we reveal the link to the claim form. Discount winners don't need this.
+  const [confirmed, setConfirmed] = useState(false);
   if (result.kind === "consolation_luck") {
     return (
       <ModalShell>
         <div className="text-center">
-          <div className="inline-flex items-center gap-2 text-[10px] font-bold tracking-[0.22em] px-3 py-1.5 rounded-full bg-ink-900 dark:bg-white/10 text-white mb-4">
-            BETTER LUCK NEXT TIME
+          <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-ink-900/5 dark:bg-white/[0.06] border border-ink-100 dark:border-white/10 text-[9.5px] font-bold tracking-[0.26em] uppercase text-ink-700/75 dark:text-white/75 mb-5">
+            Better luck next time
           </div>
-          <h3 className="font-display text-[26px] font-bold mb-2 text-ink-900 dark:text-white tracking-tight">
-            {result.title}
+          <h3 className="font-display text-[28px] sm:text-[32px] font-bold mb-3 text-ink-900 dark:text-white tracking-[-0.025em] leading-[1.05]">
+            All rewards have<br />
+            <span className="bg-lilac-gradient bg-clip-text text-transparent">been claimed.</span>
           </h3>
-          <p className="text-ink-700/75 dark:text-white/70 text-[14px] leading-relaxed mb-5">
+          <p className="text-ink-700/70 dark:text-white/65 text-[13.5px] leading-relaxed mb-5 max-w-[340px] mx-auto">
             {result.subtitle}
           </p>
-          <div className="rounded-xl bg-ink-50/70 dark:bg-white/5 border border-ink-100 dark:border-white/10 px-3 py-2 text-[12px] text-ink-700/70 dark:text-white/65 mb-4">
+          <div className="rounded-[12px] bg-ink-50/70 dark:bg-white/[0.04] border border-ink-100 dark:border-white/10 px-3 py-2 text-[11.5px] text-ink-700/70 dark:text-white/65 mb-5">
             Registered to <span className="font-semibold text-ink-900 dark:text-white">{email}</span>
           </div>
           <div className="flex flex-col gap-2">
@@ -576,15 +647,15 @@ function ResultModal({
               href="https://instagram.com/imagineart"
               target="_blank"
               rel="noreferrer"
-              className="w-full rounded-2xl bg-brand-gradient text-white font-semibold tracking-wide py-3 text-[14px] shadow-glow"
+              className="btn-gradient w-full rounded-[14px] text-white font-bold tracking-wide py-3.5 text-[13px]"
             >
               Follow on Instagram
             </a>
             <button
               onClick={onClose}
-              className="w-full rounded-2xl border border-ink-200 dark:border-white/15 text-ink-900 dark:text-white font-semibold tracking-wide py-3 text-[14px] hover:bg-ink-50 dark:hover:bg-white/10 transition"
+              className="w-full rounded-[14px] border border-ink-200 dark:border-white/15 text-ink-900 dark:text-white font-semibold tracking-wide py-3 text-[13px] hover:bg-ink-50 dark:hover:bg-white/[0.06] transition"
             >
-              Close
+              Back to wheel
             </button>
           </div>
         </div>
@@ -596,7 +667,7 @@ function ResultModal({
     result.kind === "consolation_credits" ||
     (result.kind === "prize" && result.category === "credits");
   const tag =
-    result.kind === "consolation_credits" ? "CONSOLATION WIN" : "CONGRATS, YOU WON!";
+    result.kind === "consolation_credits" ? "Consolation win" : "Congrats, you won";
   const code = result.code;
   const expires = new Date(result.codeExpiresAt);
   const link = result.redemptionLink;
@@ -605,84 +676,110 @@ function ResultModal({
     <ModalShell>
       <div>
         <div className="text-center">
-          <div className="inline-flex items-center gap-2 text-[10px] font-bold tracking-[0.22em] px-3 py-1.5 rounded-full bg-lilac-gradient text-white mb-3 shadow-glow">
-            <Sparkle className="h-3 w-3" />
+          <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-lilac-gradient text-white text-[9.5px] font-bold tracking-[0.26em] uppercase mb-4 shadow-glow">
+            <Sparkle className="h-2.5 w-2.5" />
             {tag}
           </div>
-          <h3 className="font-display text-[38px] font-bold leading-tight mb-1 tracking-tight">
+          <h3 className="font-display text-[56px] sm:text-[64px] font-bold leading-[0.9] tracking-[-0.04em]">
             <span className="bg-lilac-gradient bg-clip-text text-transparent">{result.title}</span>
           </h3>
-          <p className="text-ink-700/70 dark:text-white/65 text-[13.5px] mb-3">{result.subtitle}</p>
-          <div className="inline-flex items-center gap-2 rounded-full bg-ink-50/70 dark:bg-white/5 border border-ink-100 dark:border-white/10 px-3 py-1.5 text-[11.5px] text-ink-700/70 dark:text-white/65 mb-4">
-            <span className="uppercase tracking-[0.18em] text-[10px] font-bold text-ink-700/55 dark:text-white/55">
-              Winner
-            </span>
-            <span className="font-semibold text-ink-900 dark:text-white truncate max-w-[240px]">
-              {email}
-            </span>
+          <p className="text-ink-700/70 dark:text-white/70 text-[14.5px] mt-3">{result.subtitle}</p>
+
+          <div className="mt-5 inline-block px-5 py-3 rounded-[14px] border border-dashed border-lilac-300/70 dark:border-lilac-400/50 bg-lilac-50/60 dark:bg-lilac-400/[0.06]">
+            <div className="text-[9px] uppercase tracking-[0.26em] text-ink-700/55 dark:text-white/55 font-bold mb-0.5">
+              {isCredits ? "Reference code" : "Promo code"}
+            </div>
+            <div className="font-display font-bold text-[20px] tracking-[0.08em] select-all text-ink-900 dark:text-white break-all">
+              {code}
+            </div>
+            <div className="text-[10px] text-ink-700/55 dark:text-white/45 mt-1">
+              Valid until {expires.toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" })}
+            </div>
           </div>
         </div>
 
-        <div className="rounded-2xl border border-dashed border-ink-300 dark:border-white/20 bg-ink-50/70 dark:bg-white/5 p-4 mb-4 text-center">
-          <div className="text-[10px] uppercase tracking-[0.2em] text-ink-700/60 dark:text-white/55 mb-1">
-            {isCredits ? "Your reference code" : "Your promo code"}
-          </div>
-          <div className="font-display font-bold text-xl tracking-wider select-all text-ink-900 dark:text-white break-all">
-            {code}
-          </div>
-          <div className="text-[11px] text-ink-700/55 dark:text-white/50 mt-1">
-            Valid until {expires.toLocaleString()}
-          </div>
-        </div>
-
-        <div className="mb-4">
-          <div className="text-[11px] uppercase tracking-[0.18em] font-bold mb-2 text-ink-900 dark:text-white">
+        <div className="mt-6">
+          <div className="text-[10px] uppercase tracking-[0.22em] font-bold mb-2 text-ink-700/60 dark:text-white/55">
             How to claim
           </div>
           {isCredits ? (
-            <ol className="text-[13.5px] leading-relaxed list-decimal pl-5 space-y-1 text-ink-700/80 dark:text-white/70">
+            <ol className="text-[13px] leading-[1.65] list-decimal pl-5 space-y-1 text-ink-700/80 dark:text-white/70">
               <li>
                 <strong className="text-ink-900 dark:text-white">Screenshot this entire card</strong>{" "}
                 — your email &amp; code must both be visible.
               </li>
               <li>
-                Open the claim form below and submit your code along with the email{" "}
+                Open the claim form and submit your code with the email{" "}
                 <strong className="text-ink-900 dark:text-white">{email}</strong>.
               </li>
-              <li>Our team credits your balance within 24 hours.</li>
+              <li>We credit your balance within 24 hours.</li>
             </ol>
           ) : (
-            <ol className="text-[13.5px] leading-relaxed list-decimal pl-5 space-y-1 text-ink-700/80 dark:text-white/70">
+            <ol className="text-[13px] leading-[1.65] list-decimal pl-5 space-y-1 text-ink-700/80 dark:text-white/70">
               <li>
-                Tap <strong className="text-ink-900 dark:text-white">Redeem my discount</strong> —
-                your promo code is pre-applied on the plan page.
+                Tap <strong className="text-ink-900 dark:text-white">Redeem discount</strong> — the
+                code is pre-applied on the plan page.
               </li>
               <li>
-                Complete checkout using{" "}
-                <strong className="text-ink-900 dark:text-white">{email}</strong> to lock in the
-                reward.
+                Checkout using <strong className="text-ink-900 dark:text-white">{email}</strong> to
+                lock in the reward.
               </li>
             </ol>
           )}
         </div>
 
-        <div className="flex flex-col gap-2">
-          {link && (
-            <a
-              href={link}
-              target="_blank"
-              rel="noreferrer"
-              className="w-full rounded-2xl bg-brand-gradient text-white font-semibold tracking-wide py-3 text-[14px] shadow-glow text-center"
+        <AnimatePresence mode="wait" initial={false}>
+          {isCredits && !confirmed ? (
+            <motion.div
+              key="screenshot-step"
+              className="flex flex-col gap-2 mt-6"
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              transition={{ duration: 0.25 }}
             >
-              {isCredits ? "Open credits claim form" : "Redeem my discount"}
-            </a>
+              <button
+                onClick={() => setConfirmed(true)}
+                className="btn-gradient w-full rounded-[14px] text-white font-bold tracking-wide py-3.5 text-[13px]"
+              >
+                I&apos;ve screenshotted it →
+              </button>
+              <p className="text-[11px] text-center text-ink-700/55 dark:text-white/50">
+                Save a shot of this card before continuing — you&apos;ll need the code &amp; email to
+                claim.
+              </p>
+            </motion.div>
+          ) : (
+            <motion.div
+              key="link-step"
+              className="flex gap-2 mt-6"
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              transition={{ duration: 0.25 }}
+            >
+              {link && (
+                <a
+                  href={link}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="btn-gradient flex-1 rounded-[14px] text-white font-bold tracking-wide py-3.5 text-[13px] text-center"
+                >
+                  {isCredits ? "Access claim form →" : "Redeem discount →"}
+                </a>
+              )}
+              <button
+                onClick={onClose}
+                className="rounded-[14px] border border-ink-200 dark:border-white/15 text-ink-900 dark:text-white font-semibold tracking-wide px-5 py-3.5 text-[13px] hover:bg-ink-50 dark:hover:bg-white/[0.06] transition"
+              >
+                Close
+              </button>
+            </motion.div>
           )}
-          <button
-            onClick={onClose}
-            className="w-full rounded-2xl border border-ink-200 dark:border-white/15 text-ink-900 dark:text-white font-semibold tracking-wide py-3 text-[14px] hover:bg-ink-50 dark:hover:bg-white/10 transition"
-          >
-            {isCredits ? "I've screenshotted it" : "Close"}
-          </button>
+        </AnimatePresence>
+
+        <div className="mt-5 text-center text-[11px] text-ink-700/50 dark:text-white/45 tracking-wide">
+          Registered to <strong className="text-ink-900 dark:text-white font-semibold">{email}</strong>
         </div>
       </div>
     </ModalShell>
