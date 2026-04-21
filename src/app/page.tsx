@@ -337,6 +337,9 @@ function WinBanner({
           <div className="font-display font-bold text-[15px] tracking-[0.06em] select-all text-ink-900 dark:text-white break-all">
             {code}
           </div>
+          <div className="text-[9.5px] text-ink-700/55 dark:text-white/45 mt-1.5 leading-snug">
+            Codes are valid for 48 hours after redemption.
+          </div>
         </div>
 
         {/* Actions */}
@@ -449,12 +452,20 @@ function WheelCard({
           <Sparkle className="h-2.5 w-2.5" />
           {alreadySpun ? "Already spun" : "World Creativity & Innovation Day"}
         </div>
-        <h2 className="font-display text-[30px] sm:text-[36px] leading-[1] font-bold text-ink-900 dark:text-white tracking-[-0.03em]">
-          {alreadySpun
-            ? "You've already spun."
-            : spinning
-            ? "Good luck…"
-            : "Tap to spin"}
+        <h2 className="font-display text-[28px] sm:text-[34px] leading-[1.02] font-bold text-ink-900 dark:text-white tracking-[-0.03em]">
+          {alreadySpun ? (
+            "You've already spun."
+          ) : spinning ? (
+            "Good luck…"
+          ) : (
+            <>
+              Win Upto 70% OFF
+              <br />
+              <span className="bg-lilac-gradient bg-clip-text text-transparent">
+                on Yearly Plans
+              </span>
+            </>
+          )}
         </h2>
         <p className="text-ink-700/70 dark:text-white/65 text-[13.5px] mt-2">
           {alreadySpun
@@ -671,7 +682,6 @@ function ResultModal({
   const tag =
     result.kind === "consolation_credits" ? "Consolation win" : "Congrats, you won";
   const code = result.code;
-  const expires = new Date(result.codeExpiresAt);
   const link = result.redemptionLink;
 
   return (
@@ -694,8 +704,8 @@ function ResultModal({
             <div className="font-display font-bold text-[20px] tracking-[0.08em] select-all text-ink-900 dark:text-white break-all">
               {code}
             </div>
-            <div className="text-[10px] text-ink-700/55 dark:text-white/45 mt-1">
-              Valid until {expires.toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" })}
+            <div className="text-[10px] text-ink-700/55 dark:text-white/45 mt-2">
+              Codes are valid for 48 hours after redemption.
             </div>
           </div>
         </div>
