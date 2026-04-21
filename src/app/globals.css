@@ -1,0 +1,94 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, sans-serif;
+  --font-display: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
+
+  /* Light theme */
+  --bg: #f7f5ff;
+  --fg: #1f0e47;
+  --aurora-1: rgba(167, 139, 250, 0.45);
+  --aurora-2: rgba(196, 181, 253, 0.5);
+  --aurora-3: rgba(124, 58, 237, 0.18);
+  --grain-matrix: "0 0 0 0 0.12  0 0 0 0 0.05  0 0 0 0 0.28  0 0 0 0.35 0";
+  --grain-opacity: 0.035;
+  --grain-blend: multiply;
+}
+
+.dark {
+  /* Dark theme — deep indigo canvas, brighter aurora */
+  --bg: #0a051f;
+  --fg: #f3eeff;
+  --aurora-1: rgba(139, 92, 246, 0.55);
+  --aurora-2: rgba(124, 58, 237, 0.5);
+  --aurora-3: rgba(167, 139, 250, 0.35);
+  --grain-opacity: 0.05;
+  --grain-blend: screen;
+}
+
+html,
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-sans);
+  min-height: 100%;
+}
+
+body {
+  background:
+    radial-gradient(900px 520px at 12% -10%, var(--aurora-1), transparent 60%),
+    radial-gradient(1000px 560px at 110% 0%, var(--aurora-2), transparent 55%),
+    radial-gradient(800px 560px at 50% 120%, var(--aurora-3), transparent 60%),
+    var(--bg);
+  background-attachment: fixed;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+input:focus {
+  outline: none;
+}
+
+/* Animated aurora mesh behind cards */
+.aurora {
+  position: absolute;
+  inset: -20%;
+  z-index: 0;
+  filter: blur(60px);
+  opacity: 0.55;
+  pointer-events: none;
+  background:
+    radial-gradient(40% 40% at 20% 30%, #a78bfa 0%, transparent 70%),
+    radial-gradient(35% 35% at 80% 20%, #c4b5fd 0%, transparent 70%),
+    radial-gradient(45% 45% at 60% 80%, #7c3aed 0%, transparent 70%);
+}
+
+.dark .aurora {
+  opacity: 0.4;
+  background:
+    radial-gradient(40% 40% at 20% 30%, #8b5cf6 0%, transparent 70%),
+    radial-gradient(35% 35% at 80% 20%, #7c3aed 0%, transparent 70%),
+    radial-gradient(45% 45% at 60% 80%, #5b21b6 0%, transparent 70%);
+}
+
+/* Subtle grain over gradients */
+.grain::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='120'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.12  0 0 0 0 0.05  0 0 0 0 0.28  0 0 0 0.35 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)' opacity='0.5'/></svg>");
+  opacity: var(--grain-opacity);
+  mix-blend-mode: var(--grain-blend);
+}
+
+.spark {
+  position: absolute;
+  pointer-events: none;
+}

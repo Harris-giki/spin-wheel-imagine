@@ -1,0 +1,8 @@
+# Imagine Art — Creator Program allow-list
+# One email per line. Lines starting with # and blank lines are ignored.
+# Matching is case-insensitive and whitespace-trimmed.
+# Replace the examples below with the real list before launch.
+
+maha@imagine.art
+creator.one@example.com
+creator.two@example.com

@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Imagine Art — Spin & Win Campaign · Flow & Wireframes</title>
+<style>
+  :root {
+    --ink: #111;
+    --line: #333;
+    --muted: #777;
+    --bg: #fafafa;
+    --panel: #fff;
+    --chip: #eee;
+    --dash: #bbb;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    line-height: 1.45;
+    padding: 40px 24px 80px;
+  }
+  header {
+    max-width: 1200px;
+    margin: 0 auto 40px;
+    border-bottom: 2px solid var(--ink);
+    padding-bottom: 20px;
+  }
+  header h1 {
+    margin: 0 0 6px;
+    font-size: 28px;
+    letter-spacing: -0.01em;
+  }
+  header .sub {
+    color: var(--muted);
+    font-size: 14px;
+  }
+  section {
+    max-width: 1200px;
+    margin: 0 auto 56px;
+  }
+  h2 {
+    font-size: 20px;
+    margin: 0 0 18px;
+    border-left: 4px solid var(--ink);
+    padding-left: 10px;
+  }
+  h3 {
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin: 0 0 8px;
+    color: var(--muted);
+  }
+
+  /* ---------- Flow diagram ---------- */
+  .flow {
+    background: var(--panel);
+    border: 1.5px solid var(--ink);
+    padding: 28px;
+    overflow-x: auto;
+  }
+  .flow-grid {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(170px, 1fr));
+    gap: 8px;
+    align-items: center;
+    min-width: 1000px;
+  }
+  .node {
+    border: 1.5px solid var(--ink);
+    background: #fff;
+    padding: 14px 12px;
+    text-align: center;
+    font-size: 13px;
+    font-weight: 600;
+    min-height: 70px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+  }
+  .node.start {
+    border-radius: 999px;
+    background: var(--ink);
+    color: #fff;
+  }
+  .node.end {
+    border-radius: 999px;
+    background: #fff;
+    border-style: dashed;
+  }
+  .node.decision {
+    transform: rotate(45deg);
+    width: 110px;
+    height: 110px;
+    margin: 0 auto;
+    padding: 0;
+    background: #fff;
+  }
+  .node.decision span {
+    transform: rotate(-45deg);
+    font-size: 11px;
+    padding: 6px;
+  }
+  .arrow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    color: var(--line);
+    font-weight: 700;
+  }
+  .arrow small {
+    font-size: 10px;
+    color: var(--muted);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-right: 4px;
+  }
+  .flow-row-2 {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(170px, 1fr));
+    gap: 8px;
+    margin-top: 30px;
+    align-items: center;
+    min-width: 1000px;
+  }
+  .branch-label {
+    text-align: center;
+    font-size: 11px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-top: -12px;
+  }
+  .legend {
+    display: flex;
+    gap: 24px;
+    flex-wrap: wrap;
+    margin-top: 22px;
+    font-size: 12px;
+    color: var(--muted);
+  }
+  .legend .swatch {
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    border: 1.5px solid var(--ink);
+    margin-right: 6px;
+    vertical-align: middle;
+  }
+  .legend .swatch.start { background: var(--ink); border-radius: 50%; }
+  .legend .swatch.decision { transform: rotate(45deg); }
+  .legend .swatch.end { background: #fff; border-style: dashed; border-radius: 50%; }
+
+  /* ---------- Screens grid ---------- */
+  .screens {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 28px;
+  }
+  .screen-card {
+    background: var(--panel);
+    border: 1.5px solid var(--ink);
+    padding: 20px;
+  }
+  .screen-card .tag {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    background: var(--ink);
+    color: #fff;
+    padding: 3px 8px;
+    margin-bottom: 10px;
+  }
+  .screen-card h4 {
+    margin: 0 0 4px;
+    font-size: 16px;
+  }
+  .screen-card .desc {
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 16px;
+  }
+
+  /* Phone frame */
+  .phone {
+    border: 2px solid var(--ink);
+    border-radius: 28px;
+    padding: 18px 14px;
+    background: #fff;
+    aspect-ratio: 9 / 17;
+    max-width: 260px;
+    margin: 0 auto;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  .phone::before {
+    content: "";
+    position: absolute;
+    top: 6px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60px;
+    height: 6px;
+    background: var(--ink);
+    border-radius: 4px;
+  }
+  .phone-inner {
+    margin-top: 14px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    font-size: 10px;
+  }
+  .logo {
+    text-align: center;
+    font-weight: 800;
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    padding: 6px 0;
+    border-bottom: 1px dashed var(--dash);
+    margin-bottom: 10px;
+  }
+  .hero {
+    text-align: center;
+    font-size: 13px;
+    font-weight: 700;
+    margin: 10px 0 4px;
+    line-height: 1.2;
+  }
+  .sub-text {
+    text-align: center;
+    font-size: 10px;
+    color: var(--muted);
+    margin-bottom: 12px;
+  }
+  .input {
+    border: 1px solid var(--ink);
+    padding: 7px 9px;
+    font-size: 10px;
+    margin-bottom: 8px;
+    color: var(--muted);
+  }
+  .btn {
+    background: var(--ink);
+    color: #fff;
+    text-align: center;
+    padding: 8px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+  .btn.ghost {
+    background: #fff;
+    color: var(--ink);
+    border: 1px solid var(--ink);
+  }
+  .fine {
+    font-size: 8px;
+    color: var(--muted);
+    text-align: center;
+    margin-top: 10px;
+    line-height: 1.3;
+  }
+
+  /* Wheel */
+  .wheel-wrap {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 8px 0 12px;
+    position: relative;
+  }
+  .wheel {
+    width: 140px;
+    height: 140px;
+    border-radius: 50%;
+    border: 2px solid var(--ink);
+    position: relative;
+    background:
+      conic-gradient(
+        #fff 0 45deg,
+        #eee 45deg 90deg,
+        #fff 90deg 135deg,
+        #ddd 135deg 180deg,
+        #fff 180deg 225deg,
+        #eee 225deg 270deg,
+        #fff 270deg 315deg,
+        #ccc 315deg 360deg
+      );
+  }
+  .wheel::after {
+    content: "";
+    position: absolute;
+    top: 50%; left: 50%;
+    width: 16px; height: 16px;
+    background: var(--ink);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+  }
+  .wheel-pin {
+    position: absolute;
+    top: -6px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0; height: 0;
+    border-left: 8px solid transparent;
+    border-right: 8px solid transparent;
+    border-top: 14px solid var(--ink);
+  }
+  .wheel-labels {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+  }
+  .wheel-labels span {
+    position: absolute;
+    font-size: 7px;
+    font-weight: 700;
+  }
+
+  /* Popup overlay */
+  .phone.overlay::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0.35);
+    pointer-events: none;
+  }
+  .popup {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 82%;
+    background: #fff;
+    border: 1.5px solid var(--ink);
+    padding: 14px 12px;
+    text-align: center;
+    z-index: 2;
+    box-shadow: 4px 4px 0 var(--ink);
+  }
+  .popup .p-title {
+    font-size: 11px;
+    font-weight: 800;
+    margin-bottom: 4px;
+  }
+  .popup .p-body {
+    font-size: 9px;
+    color: var(--muted);
+    margin-bottom: 8px;
+    line-height: 1.4;
+  }
+  .popup .p-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+  .popup .p-actions .btn {
+    padding: 6px;
+    font-size: 9px;
+  }
+
+  /* Prize card */
+  .prize-box {
+    border: 1.5px dashed var(--ink);
+    padding: 10px 8px;
+    text-align: center;
+    margin: 10px 0;
+  }
+  .prize-box .big {
+    font-size: 14px;
+    font-weight: 800;
+    margin-bottom: 2px;
+  }
+  .prize-box .small {
+    font-size: 9px;
+    color: var(--muted);
+  }
+  .steps {
+    font-size: 9px;
+    line-height: 1.5;
+    padding-left: 14px;
+    margin: 0 0 8px;
+  }
+  .steps li { margin-bottom: 3px; }
+  .callout {
+    background: var(--chip);
+    border-left: 3px solid var(--ink);
+    padding: 6px 8px;
+    font-size: 8.5px;
+    margin-bottom: 8px;
+  }
+
+  /* Notes */
+  .notes {
+    background: var(--panel);
+    border: 1.5px solid var(--ink);
+    padding: 20px 24px;
+    font-size: 14px;
+  }
+  .notes ul { padding-left: 22px; margin: 8px 0; }
+  .notes li { margin-bottom: 6px; }
+  .notes strong { font-weight: 700; }
+
+  .divider-note {
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 12px;
+  }
+  .popup-tag {
+    display: inline-block;
+    background: #fff;
+    border: 1px dashed var(--ink);
+    font-size: 10px;
+    padding: 2px 6px;
+    margin-left: 6px;
+    vertical-align: middle;
+  }
+
+  @media (max-width: 720px) {
+    .flow-grid, .flow-row-2 { grid-template-columns: 1fr; }
+    .node.decision { transform: none; width: auto; height: auto; padding: 14px 12px; }
+    .node.decision span { transform: none; }
+    .arrow { transform: rotate(90deg); margin: 4px 0; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Imagine Art — Spin &amp; Win Campaign</h1>
+  <div class="sub">User flow diagram + wireframe mockups · Social promo (Instagram Stories &amp; X/Twitter) · Black &amp; white low-fi</div>
+</header>
+
+<!-- ============ FLOW DIAGRAM ============ -->
+<section>
+  <h2>1 · User Flow Diagram</h2>
+  <div class="divider-note">The path a user takes from tapping the social link to claiming (or missing) their discount.</div>
+
+  <div class="flow">
+    <!-- Row 1 -->
+    <div class="flow-grid">
+      <div class="node start">Tap link<br/>(IG story / X)</div>
+      <div class="arrow">→</div>
+      <div class="node">Screen 1<br/>Landing + Email</div>
+      <div class="arrow"><small>submit</small>→</div>
+      <div class="node decision"><span>Email<br/>registered?</span></div>
+    </div>
+
+    <!-- Row 2: branches from decision -->
+    <div class="flow-row-2">
+      <div></div>
+      <div></div>
+      <div></div>
+      <div></div>
+      <div style="display:flex; flex-direction:column; gap:10px;">
+        <div style="text-align:center; font-size:11px; color:var(--muted);">NO ↓ &nbsp; &nbsp; YES ↓</div>
+      </div>
+    </div>
+
+    <div class="flow-grid" style="margin-top: 8px;">
+      <div></div>
+      <div></div>
+      <div></div>
+      <div class="node" style="background:#f4f4f4;">Popup A<br/>"Email not found"<br/><small style="font-weight:400; color:var(--muted);">→ Sign up / retry</small></div>
+      <div class="node">Screen 2<br/>Spin the Wheel</div>
+    </div>
+
+    <div class="flow-grid" style="margin-top: 20px;">
+      <div></div>
+      <div></div>
+      <div></div>
+      <div></div>
+      <div class="arrow" style="flex-direction:column;"><small>spin</small>↓</div>
+    </div>
+
+    <div class="flow-grid" style="margin-top: 8px;">
+      <div></div>
+      <div></div>
+      <div></div>
+      <div></div>
+      <div class="node decision"><span>Prize still<br/>available?</span></div>
+    </div>
+
+    <div class="flow-grid" style="margin-top: 20px;">
+      <div></div>
+      <div></div>
+      <div></div>
+      <div class="node" style="background:#f4f4f4;">Popup B<br/>"Better luck<br/>next time"<br/><small style="font-weight:400; color:var(--muted);">→ Follow / close</small></div>
+      <div class="node">Screen 3<br/>Prize Won +<br/>Screenshot</div>
+    </div>
+
+    <div class="flow-grid" style="margin-top: 20px;">
+      <div></div>
+      <div></div>
+      <div></div>
+      <div class="arrow" style="flex-direction:column;"><small>close</small>↓</div>
+      <div class="arrow" style="flex-direction:column;"><small>DM admin</small>↓</div>
+    </div>
+
+    <div class="flow-grid" style="margin-top: 8px;">
+      <div></div>
+      <div></div>
+      <div></div>
+      <div class="node end">Exit</div>
+      <div class="node end">Exit<br/>(code redeemed<br/>off-platform)</div>
+    </div>
+
+    <div class="legend">
+      <span><span class="swatch start"></span>Start / Entry</span>
+      <span><span class="swatch"></span>Screen</span>
+      <span><span class="swatch decision"></span>Decision</span>
+      <span><span class="swatch" style="background:#f4f4f4;"></span>Popup / Modal</span>
+      <span><span class="swatch end"></span>End state</span>
+    </div>
+  </div>
+</section>
+
+<!-- ============ WIREFRAMES ============ -->
+<section>
+  <h2>2 · Screen Wireframes</h2>
+  <div class="divider-note">Mobile-first. Each tile below represents one screen or popup state. Popups are shown as overlays on top of the screen they interrupt.</div>
+
+  <div class="screens">
+
+    <!-- SCREEN 1 -->
+    <div class="screen-card">
+      <span class="tag">Screen 1</span>
+      <h4>Landing + Email Entry</h4>
+      <div class="desc">First touchpoint after tapping the IG/X link. Validates the user against the Imagine Art database.</div>
+      <div class="phone">
+        <div class="phone-inner">
+          <div class="logo">◆ IMAGINE ART</div>
+          <div class="hero">Spin &amp; Win<br/>Exclusive Discounts</div>
+          <div class="sub-text">Only for registered Imagine Art users. Enter your email to unlock your spin.</div>
+          <div style="flex:1"></div>
+          <div class="input">your@email.com</div>
+          <div class="btn">Continue →</div>
+          <div class="fine">By continuing you agree to the campaign T&amp;Cs. Limit: 1 spin per account.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- POPUP A -->
+    <div class="screen-card">
+      <span class="tag">Popup A</span>
+      <h4>Email Not Registered <span class="popup-tag">overlay on Screen 1</span></h4>
+      <div class="desc">Shown when the submitted email doesn't match any Imagine Art account.</div>
+      <div class="phone overlay">
+        <div class="phone-inner" style="opacity:0.4;">
+          <div class="logo">◆ IMAGINE ART</div>
+          <div class="hero">Spin &amp; Win<br/>Exclusive Discounts</div>
+          <div class="sub-text">Only for registered users.</div>
+          <div style="flex:1"></div>
+          <div class="input">notfound@email.com</div>
+          <div class="btn">Continue →</div>
+        </div>
+        <div class="popup">
+          <div class="p-title">Email not registered</div>
+          <div class="p-body">We couldn't find this email in our records. Sign up for Imagine Art first, then come back to claim your reward.</div>
+          <div class="p-actions">
+            <div class="btn">Sign up for Imagine Art</div>
+            <div class="btn ghost">Try another email</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SCREEN 2 -->
+    <div class="screen-card">
+      <span class="tag">Screen 2</span>
+      <h4>Spin the Wheel</h4>
+      <div class="desc">500 prize slots distributed across reward tiers (e.g., 10% / 25% / 50% off, free month, free credits). Decrements as users claim.</div>
+      <div class="phone">
+        <div class="phone-inner">
+          <div class="logo">◆ IMAGINE ART</div>
+          <div class="hero">You're in!<br/>Tap to spin</div>
+          <div class="sub-text">One spin only — make it count.</div>
+          <div class="wheel-wrap">
+            <div class="wheel-pin"></div>
+            <div class="wheel">
+              <div class="wheel-labels">
+                <span style="top:8px; left:50%; transform:translateX(-50%);">25%</span>
+                <span style="top:30%; right:6px;">10%</span>
+                <span style="bottom:30%; right:6px;">FREE</span>
+                <span style="bottom:8px; left:50%; transform:translateX(-50%);">50%</span>
+                <span style="bottom:30%; left:6px;">5%</span>
+                <span style="top:30%; left:6px;">CRED</span>
+              </div>
+            </div>
+          </div>
+          <div class="btn">Spin now</div>
+          <div class="fine">maha@imagine.art · 1 spin remaining</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SCREEN 3 -->
+    <div class="screen-card">
+      <span class="tag">Screen 3</span>
+      <h4>Prize Won — Screenshot &amp; Claim</h4>
+      <div class="desc">Success state. The user must screenshot and DM the admin account to redeem — this is the redemption instruction screen.</div>
+      <div class="phone">
+        <div class="phone-inner">
+          <div class="logo">◆ IMAGINE ART</div>
+          <div class="hero" style="font-size:12px;">Congrats, you won!</div>
+          <div class="prize-box">
+            <div class="big">25% OFF</div>
+            <div class="small">Monthly Creator Plan</div>
+          </div>
+          <div class="callout"><strong>Code:</strong> SPIN-25-X7K9<br/>Valid for 48 hours</div>
+          <div style="font-size:9px; font-weight:700; margin-bottom:4px;">How to claim:</div>
+          <ol class="steps">
+            <li>Screenshot this entire screen</li>
+            <li>DM the screenshot to @ImagineArt on Instagram or X</li>
+            <li>Admin will verify &amp; apply your discount within 24h</li>
+          </ol>
+          <div class="btn">I've screenshotted it</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- POPUP B -->
+    <div class="screen-card">
+      <span class="tag">Popup B</span>
+      <h4>Better Luck Next Time <span class="popup-tag">overlay on Screen 2</span></h4>
+      <div class="desc">Triggered when the landed-on prize slot has been fully claimed (quota of 500 exhausted for that tier).</div>
+      <div class="phone overlay">
+        <div class="phone-inner" style="opacity:0.4;">
+          <div class="logo">◆ IMAGINE ART</div>
+          <div class="hero">Spinning...</div>
+          <div class="wheel-wrap">
+            <div class="wheel-pin"></div>
+            <div class="wheel"></div>
+          </div>
+        </div>
+        <div class="popup">
+          <div class="p-title">Better luck next time!</div>
+          <div class="p-body">All rewards in this slot have been claimed. Follow us for the next giveaway — we run these every month.</div>
+          <div class="p-actions">
+            <div class="btn">Follow on Instagram</div>
+            <div class="btn ghost">Close</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ============ NOTES ============ -->
+<section>
+  <h2>3 · Logic &amp; Edge-Case Notes (for dev hand-off)</h2>
+  <div class="notes">
+    <p><strong>Prize pool:</strong> 500 total prize slots, distributed across tiers. Each tier has its own counter (e.g., 25% off = 120 slots, 50% off = 30 slots). When the counter for a given tier hits 0, the wheel still shows the segment but the spin resolver re-rolls to "Better luck next time" (Popup B) — this prevents the user from seeing an empty wheel while keeping the UI consistent.</p>
+
+    <p><strong>Email validation:</strong> Screen 1 hits the Imagine Art user DB. Only exact-match registered emails pass. Case-insensitive, trim whitespace. Rate-limit to 5 attempts per IP per hour to prevent email enumeration.</p>
+
+    <p><strong>One spin per user:</strong> Track by email + device fingerprint. If the same email returns, show a "You've already spun — here's your code again" state (this is a future addition, not in the current flow).</p>
+
+    <p><strong>Screenshot &amp; DM mechanic:</strong> Because redemption is manual via social DM, the prize code on Screen 3 must be unique per user (e.g., SPIN-25-X7K9) so admin can invalidate after use. Store the code server-side with status: issued → claimed.</p>
+
+    <p><strong>Expiry:</strong> Codes valid 48 hours from issue. Admin response SLA: 24h.</p>
+
+    <p><strong>Analytics to capture:</strong> link taps by source (IG vs X), email submit rate, email-not-found rate, spin completion, prize distribution, screenshot-confirm tap rate, DM-to-admin conversion.</p>
+
+    <p><strong>Anti-abuse:</strong> Hide the prize-allocation logic server-side. Never expose "slots remaining" in client responses. Verify the email → spin → code issuance chain server-to-server.</p>
+
+    <p><strong>Screens NOT yet designed (future v2):</strong> Already-spun state · Expired-code state · Admin dashboard for verifying screenshots.</p>
+  </div>
+</section>
+
+</body>
+</html>
