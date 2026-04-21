@@ -381,11 +381,13 @@ function EmailCard({
         World Creativity &amp; Innovation Day
       </div>
 
-      <h1 className="font-display text-[44px] sm:text-[52px] leading-[0.95] font-bold text-ink-900 dark:text-white tracking-[-0.035em]">
+      <h1 className="font-display text-[40px] sm:text-[48px] leading-[0.98] font-bold text-ink-900 dark:text-white tracking-[-0.035em]">
         Spin once.
         <br />
         <span className="bg-lilac-gradient bg-clip-text text-transparent">
-          Win something rare.
+          Win Upto 70% OFF
+          <br />
+          on Yearly Plans
         </span>
       </h1>
       <p className="text-ink-700/75 dark:text-white/70 text-[14.5px] leading-relaxed mt-4 mb-7 max-w-[380px]">
