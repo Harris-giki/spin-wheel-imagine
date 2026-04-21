@@ -15,17 +15,21 @@ const ThemeCtx = createContext<Ctx | null>(null);
 export const THEME_BOOTSTRAP_SCRIPT = `
 (function() {
   try {
+    // Dark mode is the brand default. Honor an explicit user override from
+    // localStorage; otherwise always start in dark regardless of OS setting.
     var s = localStorage.getItem('ia-theme');
-    var sys = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    var t = s || (sys ? 'dark' : 'light');
+    var t = s === 'light' ? 'light' : 'dark';
     if (t === 'dark') document.documentElement.classList.add('dark');
     document.documentElement.style.colorScheme = t;
-  } catch (e) {}
+  } catch (e) {
+    document.documentElement.classList.add('dark');
+    document.documentElement.style.colorScheme = 'dark';
+  }
 })();
 `;
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [theme, setThemeState] = useState<Theme>("light");
+  const [theme, setThemeState] = useState<Theme>("dark");
 
   // Sync state with whatever the bootstrap script set on the <html> element.
   useEffect(() => {

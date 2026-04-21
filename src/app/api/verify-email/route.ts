@@ -28,12 +28,21 @@ export async function POST(req: Request) {
     return NextResponse.json({ ok: false, error: "INVALID_EMAIL" }, { status: 400 });
   }
 
-  await connectDB();
-  const prior = await Spin.findOne({ email }).lean();
-
-  return NextResponse.json({
-    ok: true,
-    email,
-    alreadySpun: Boolean(prior),
-  });
+  try {
+    await connectDB();
+    const prior = await Spin.findOne({ email }).lean();
+    return NextResponse.json({
+      ok: true,
+      email,
+      alreadySpun: Boolean(prior),
+    });
+  } catch (err) {
+    // Surfaces the real reason (e.g. missing MONGODB_URI, Atlas IP block,
+    // auth failure) in Vercel's function logs without leaking to the client.
+    console.error("[/api/verify-email] failed:", err);
+    return NextResponse.json(
+      { ok: false, error: "DB_UNAVAILABLE" },
+      { status: 500 }
+    );
+  }
 }

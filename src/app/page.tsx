@@ -355,7 +355,7 @@ function WheelCard({
         <div className="text-center mb-5">
           <div className="inline-flex items-center gap-2 text-[10px] font-bold tracking-[0.22em] px-3 py-1.5 rounded-full bg-lilac-gradient text-white mb-3 shadow-glow">
             <Sparkle className="h-3 w-3" />
-            {alreadySpun ? "ALREADY SPUN" : "YOU'RE IN"}
+            {alreadySpun ? "ALREADY SPUN" : "WORLD CREATIVITY & INNOVATION DAY"}
           </div>
           <h2 className="font-display text-[28px] sm:text-[32px] leading-tight font-bold text-ink-900 dark:text-white tracking-tight">
             {alreadySpun
@@ -639,29 +639,31 @@ function ResultModal({
           <div className="text-[11px] uppercase tracking-[0.18em] font-bold mb-2 text-ink-900 dark:text-white">
             How to claim
           </div>
-          <ol className="text-[13.5px] leading-relaxed list-decimal pl-5 space-y-1 text-ink-700/80 dark:text-white/70">
-            <li>
-              <strong className="text-ink-900 dark:text-white">Screenshot this entire card</strong>{" "}
-              — your email &amp; code must both be visible.
-            </li>
-            {isCredits ? (
-              <>
-                <li>
-                  Open the claim form below and submit your code along with the email{" "}
-                  <strong className="text-ink-900 dark:text-white">{email}</strong>.
-                </li>
-                <li>Our team credits your balance within 24 hours.</li>
-              </>
-            ) : (
-              <>
-                <li>
-                  Tap the button below to open the plan page — your discount is pre-applied via the
-                  promo code.
-                </li>
-                <li>Complete checkout from the same email to lock in the reward.</li>
-              </>
-            )}
-          </ol>
+          {isCredits ? (
+            <ol className="text-[13.5px] leading-relaxed list-decimal pl-5 space-y-1 text-ink-700/80 dark:text-white/70">
+              <li>
+                <strong className="text-ink-900 dark:text-white">Screenshot this entire card</strong>{" "}
+                — your email &amp; code must both be visible.
+              </li>
+              <li>
+                Open the claim form below and submit your code along with the email{" "}
+                <strong className="text-ink-900 dark:text-white">{email}</strong>.
+              </li>
+              <li>Our team credits your balance within 24 hours.</li>
+            </ol>
+          ) : (
+            <ol className="text-[13.5px] leading-relaxed list-decimal pl-5 space-y-1 text-ink-700/80 dark:text-white/70">
+              <li>
+                Tap <strong className="text-ink-900 dark:text-white">Redeem my discount</strong> —
+                your promo code is pre-applied on the plan page.
+              </li>
+              <li>
+                Complete checkout using{" "}
+                <strong className="text-ink-900 dark:text-white">{email}</strong> to lock in the
+                reward.
+              </li>
+            </ol>
+          )}
         </div>
 
         <div className="flex flex-col gap-2">
@@ -679,7 +681,7 @@ function ResultModal({
             onClick={onClose}
             className="w-full rounded-2xl border border-ink-200 dark:border-white/15 text-ink-900 dark:text-white font-semibold tracking-wide py-3 text-[14px] hover:bg-ink-50 dark:hover:bg-white/10 transition"
           >
-            I&apos;ve screenshotted it
+            {isCredits ? "I've screenshotted it" : "Close"}
           </button>
         </div>
       </div>

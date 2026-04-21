@@ -57,8 +57,8 @@ export type Prize = {
   textColor: string;
 };
 
-const PLAN_URL = (promo: string) =>
-  `https://www.imagine.art/custom-plan-iap?plan=Ultimate&promo=${promo}`;
+const PLAN_URL = (plan: "Creator" | "Ultimate" | "Standard", promo: string) =>
+  `https://www.imagine.art/custom-plan-iap?plan=${plan}&promo=${promo}`;
 
 export const PRIZES: Prize[] = [
   // Jackpots — triple 40% off (the headlines, deepest purples)
@@ -71,7 +71,7 @@ export const PRIZES: Prize[] = [
     quantity: 3,
     odds: 0.01,
     promoCode: "STWCREATOR40",
-    redemptionLink: PLAN_URL("STWCREATOR40"),
+    redemptionLink: PLAN_URL("Creator", "STWCREATOR40"),
     color: "#1f0e47",
     textColor: "#faf7ff",
   },
@@ -84,7 +84,7 @@ export const PRIZES: Prize[] = [
     quantity: 5,
     odds: 0.01,
     promoCode: "STWULTIMATE40",
-    redemptionLink: PLAN_URL("STWULTIMATE40"),
+    redemptionLink: PLAN_URL("Ultimate", "STWULTIMATE40"),
     color: "#2a1263",
     textColor: "#faf7ff",
   },
@@ -97,7 +97,7 @@ export const PRIZES: Prize[] = [
     quantity: 10,
     odds: 0.02,
     promoCode: "STWSTANDARD40",
-    redemptionLink: PLAN_URL("STWSTANDARD40"),
+    redemptionLink: PLAN_URL("Standard", "STWSTANDARD40"),
     color: "#371a7f",
     textColor: "#faf7ff",
   },
@@ -112,7 +112,7 @@ export const PRIZES: Prize[] = [
     quantity: 15,
     odds: 0.03,
     promoCode: "STWCREATOR20",
-    redemptionLink: PLAN_URL("STWCREATOR20"),
+    redemptionLink: PLAN_URL("Creator", "STWCREATOR20"),
     color: "#4d25ab",
     textColor: "#faf7ff",
   },
@@ -125,7 +125,7 @@ export const PRIZES: Prize[] = [
     quantity: 25,
     odds: 0.06,
     promoCode: "STWCREATOR10",
-    redemptionLink: PLAN_URL("STWCREATOR10"),
+    redemptionLink: PLAN_URL("Creator", "STWCREATOR10"),
     color: "#6a3fcb",
     textColor: "#faf7ff",
   },
@@ -140,7 +140,7 @@ export const PRIZES: Prize[] = [
     quantity: 25,
     odds: 0.06,
     promoCode: "STWULTIMATE25",
-    redemptionLink: PLAN_URL("STWULTIMATE25"),
+    redemptionLink: PLAN_URL("Ultimate", "STWULTIMATE25"),
     color: "#7c3aed",
     textColor: "#faf7ff",
   },
@@ -153,7 +153,7 @@ export const PRIZES: Prize[] = [
     quantity: 60,
     odds: 0.13,
     promoCode: "STWULTIMATE15",
-    redemptionLink: PLAN_URL("STWULTIMATE15"),
+    redemptionLink: PLAN_URL("Ultimate", "STWULTIMATE15"),
     color: "#8b5cf6",
     textColor: "#faf7ff",
   },
@@ -168,7 +168,7 @@ export const PRIZES: Prize[] = [
     quantity: 67,
     odds: 0.15,
     promoCode: "STWSTANDARD30",
-    redemptionLink: PLAN_URL("STWSTANDARD30"),
+    redemptionLink: PLAN_URL("Standard", "STWSTANDARD30"),
     color: "#a78bfa",
     textColor: "#1f0e47",
   },
@@ -181,7 +181,7 @@ export const PRIZES: Prize[] = [
     quantity: 110,
     odds: 0.24,
     promoCode: "STWSTANDARD25",
-    redemptionLink: PLAN_URL("STWSTANDARD25"),
+    redemptionLink: PLAN_URL("Standard", "STWSTANDARD25"),
     color: "#c4b5fd",
     textColor: "#1f0e47",
   },
@@ -194,7 +194,7 @@ export const PRIZES: Prize[] = [
     quantity: 130,
     odds: 0.29,
     promoCode: "STWSTANDARD20",
-    redemptionLink: PLAN_URL("STWSTANDARD20"),
+    redemptionLink: PLAN_URL("Standard", "STWSTANDARD20"),
     color: "#d8c7ff",
     textColor: "#1f0e47",
   },
