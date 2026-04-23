@@ -278,7 +278,7 @@ function WinBanner({
           </div>
           <div className="flex gap-2 shrink-0">
             <a
-              href="https://instagram.com/imagineart"
+              href="https://www.instagram.com/imagineartofficial/"
               target="_blank"
               rel="noreferrer"
               className="btn-gradient rounded-[12px] text-white font-bold tracking-wide px-4 py-2.5 text-[12.5px] text-center whitespace-nowrap"
@@ -657,7 +657,7 @@ function ResultModal({
           </div>
           <div className="flex flex-col gap-2">
             <a
-              href="https://instagram.com/imagineart"
+              href="https://www.instagram.com/imagineartofficial/"
               target="_blank"
               rel="noreferrer"
               className="btn-gradient w-full rounded-[14px] text-white font-bold tracking-wide py-3.5 text-[13px]"
